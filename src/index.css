@@ -1,0 +1,76 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f5f7fb;
+  color: #1f2937;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app {
+  min-height: 100vh;
+  padding: 48px 20px;
+}
+
+.page {
+  width: min(960px, 100%);
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-header h1 {
+  color: #123c69;
+  font-weight: 700;
+}
+
+.page-header p {
+  color: #5f6f89;
+}
+
+.form-card {
+  padding: 32px;
+  border: 1px solid #dde5f2;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.form-card h2 {
+  color: #123c69;
+  font-weight: 700;
+}
+
+.MuiButton-contained {
+  background-color: #123c69;
+  box-shadow: none;
+}
+
+.MuiButton-contained:hover {
+  background-color: #0d2e50;
+  box-shadow: none;
+}
+
+@media (max-width: 640px) {
+  .app {
+    padding: 28px 14px;
+  }
+
+  .form-card {
+    padding: 22px;
+  }
+}
