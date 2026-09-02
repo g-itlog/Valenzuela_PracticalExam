@@ -38,9 +38,23 @@ const defaultForm = {
   role: "",
 };
 
+const defaultTouched = {
+  gadgetName: false,
+  category: false,
+  manufacturer: false,
+  healthRating: false,
+  techBrand: false,
+  role: false,
+};
+
+const categoryOptions = ["Smartphone", "Laptop", "Wearable", "Audio"];
+const roleOptions = ["Engineer", "Tester"];
+
 function App() {
   const [form, setForm] = useState(defaultForm);
   const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState(defaultTouched);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
   const [gadgets, setGadgets] = useState([]);
   const [savedMessage, setSavedMessage] = useState("");
   const [currentView, setCurrentView] = useState("form");
@@ -117,21 +131,26 @@ function App() {
 
   const validateForm = (currentForm) => {
     const newErrors = {};
-    const ratingNumber = Number(currentForm.healthRating);
+    const ratingText = String(currentForm.healthRating).trim();
+    const ratingNumber = Number(ratingText);
 
-    if (currentForm.gadgetName.trim().length < 3) {
+    if (!currentForm.gadgetName.trim()) {
+      newErrors.gadgetName = "Gadget name is required.";
+    } else if (currentForm.gadgetName.trim().length < 3) {
       newErrors.gadgetName = "Gadget name must be at least 3 characters.";
     }
 
     if (!currentForm.category) {
       newErrors.category = "Please choose a category.";
+    } else if (!categoryOptions.includes(currentForm.category)) {
+      newErrors.category = "Please choose a valid category.";
     }
 
     if (!currentForm.manufacturer.trim()) {
       newErrors.manufacturer = "Manufacturer is required.";
     }
 
-    if (!currentForm.healthRating) {
+    if (!ratingText) {
       newErrors.healthRating = "Health rating is required.";
     } else if (
       Number.isNaN(ratingNumber) ||
@@ -147,9 +166,23 @@ function App() {
 
     if (!currentForm.role) {
       newErrors.role = "Please select a user role.";
+    } else if (!roleOptions.includes(currentForm.role)) {
+      newErrors.role = "Please select a valid user role.";
     }
 
     return newErrors;
+  };
+
+  const showFieldError = (fieldName) => {
+    return Boolean(errors[fieldName] && (touched[fieldName] || submitAttempted));
+  };
+
+  const getHelperText = (fieldName, normalText = " ") => {
+    if (touched[fieldName] || submitAttempted) {
+      return errors[fieldName] || normalText;
+    }
+
+    return normalText;
   };
 
   const handleInputChange = (event) => {
@@ -161,7 +194,21 @@ function App() {
 
     setForm(updatedForm);
     setErrors(validateForm(updatedForm));
+    setTouched((currentTouched) => ({
+      ...currentTouched,
+      [name]: true,
+    }));
     setSavedMessage("");
+  };
+
+  const handleInputBlur = (event) => {
+    const { name } = event.target;
+
+    setTouched((currentTouched) => ({
+      ...currentTouched,
+      [name]: true,
+    }));
+    setErrors(validateForm(form));
   };
 
   const handleSubmit = (event) => {
@@ -169,6 +216,7 @@ function App() {
 
     const formErrors = validateForm(form);
     setErrors(formErrors);
+    setSubmitAttempted(true);
 
     if (Object.keys(formErrors).length > 0) {
       setSavedMessage("");
@@ -188,6 +236,8 @@ function App() {
     setGadgets([...gadgets, newGadget]);
     setForm(defaultForm);
     setErrors({});
+    setTouched(defaultTouched);
+    setSubmitAttempted(false);
     setSavedMessage(`${newGadget.gadgetName} was added to the inventory.`);
     setCategoryFilter("All");
     setSelectedGadgetId(newGadget.id);
@@ -265,12 +315,13 @@ function App() {
                 name="gadgetName"
                 value={form.gadgetName}
                 onChange={handleInputChange}
-                error={Boolean(errors.gadgetName)}
-                helperText={errors.gadgetName || " "}
+                onBlur={handleInputBlur}
+                error={showFieldError("gadgetName")}
+                helperText={getHelperText("gadgetName")}
                 fullWidth
               />
 
-              <FormControl fullWidth error={Boolean(errors.category)}>
+              <FormControl fullWidth error={showFieldError("category")}>
                 <InputLabel id="category-label">Category</InputLabel>
                 <Select
                   labelId="category-label"
@@ -278,13 +329,14 @@ function App() {
                   name="category"
                   value={form.category}
                   onChange={handleInputChange}
+                  onBlur={handleInputBlur}
                 >
                   <MenuItem value="Smartphone">Smartphone</MenuItem>
                   <MenuItem value="Laptop">Laptop</MenuItem>
                   <MenuItem value="Wearable">Wearable</MenuItem>
                   <MenuItem value="Audio">Audio</MenuItem>
                 </Select>
-                <FormHelperText>{errors.category || " "}</FormHelperText>
+                <FormHelperText>{getHelperText("category")}</FormHelperText>
               </FormControl>
 
               <TextField
@@ -292,8 +344,9 @@ function App() {
                 name="manufacturer"
                 value={form.manufacturer}
                 onChange={handleInputChange}
-                error={Boolean(errors.manufacturer)}
-                helperText={errors.manufacturer || " "}
+                onBlur={handleInputBlur}
+                error={showFieldError("manufacturer")}
+                helperText={getHelperText("manufacturer")}
                 fullWidth
               />
 
@@ -303,8 +356,9 @@ function App() {
                 type="number"
                 value={form.healthRating}
                 onChange={handleInputChange}
-                error={Boolean(errors.healthRating)}
-                helperText={errors.healthRating || "1 to 100"}
+                onBlur={handleInputBlur}
+                error={showFieldError("healthRating")}
+                helperText={getHelperText("healthRating", "1 to 100")}
                 inputProps={{ min: 1, max: 100 }}
                 fullWidth
               />
@@ -314,18 +368,20 @@ function App() {
                 name="techBrand"
                 value={form.techBrand}
                 onChange={handleInputChange}
-                error={Boolean(errors.techBrand)}
-                helperText={errors.techBrand || " "}
+                onBlur={handleInputBlur}
+                error={showFieldError("techBrand")}
+                helperText={getHelperText("techBrand")}
                 fullWidth
               />
 
-              <FormControl error={Boolean(errors.role)}>
+              <FormControl error={showFieldError("role")}>
                 <FormLabel>User Role</FormLabel>
                 <RadioGroup
                   row
                   name="role"
                   value={form.role}
                   onChange={handleInputChange}
+                  onBlur={handleInputBlur}
                 >
                   <FormControlLabel
                     value="Engineer"
@@ -338,7 +394,7 @@ function App() {
                     label="Tester"
                   />
                 </RadioGroup>
-                <FormHelperText>{errors.role || " "}</FormHelperText>
+                <FormHelperText>{getHelperText("role")}</FormHelperText>
               </FormControl>
 
               <Button type="submit" variant="contained" size="large">
@@ -484,8 +540,7 @@ function App() {
                           <span>Category:</span> {activeGadget.category}
                         </Typography>
                         <Typography>
-                          <span>Manufacturer:</span>{" "}
-                          {activeGadget.manufacturer}
+                          <span>Manufacturer:</span> {activeGadget.manufacturer}
                         </Typography>
                         <Typography>
                           <span>Health Rating:</span>{" "}
