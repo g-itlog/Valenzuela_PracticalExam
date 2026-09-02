@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   flexRender,
   getCoreRowModel,
@@ -8,6 +8,7 @@ import {
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormHelperText from "@mui/material/FormHelperText";
@@ -43,10 +44,21 @@ function App() {
   const [gadgets, setGadgets] = useState([]);
   const [savedMessage, setSavedMessage] = useState("");
   const [currentView, setCurrentView] = useState("form");
+  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [selectedGadgetId, setSelectedGadgetId] = useState("");
+  const [activeGadget, setActiveGadget] = useState(null);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 5,
   });
+
+  const filteredGadgets = useMemo(() => {
+    if (categoryFilter === "All") {
+      return gadgets;
+    }
+
+    return gadgets.filter((gadget) => gadget.category === categoryFilter);
+  }, [categoryFilter, gadgets]);
 
   const columns = useMemo(
     () => [
@@ -79,7 +91,7 @@ function App() {
   );
 
   const table = useReactTable({
-    data: gadgets,
+    data: filteredGadgets,
     columns,
     state: {
       pagination,
@@ -88,6 +100,20 @@ function App() {
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
+
+  useEffect(() => {
+    const matchingGadget = filteredGadgets.find(
+      (gadget) => gadget.id === selectedGadgetId,
+    );
+
+    if (matchingGadget) {
+      setActiveGadget(matchingGadget);
+      return;
+    }
+
+    setSelectedGadgetId("");
+    setActiveGadget(null);
+  }, [filteredGadgets, selectedGadgetId]);
 
   const validateForm = (currentForm) => {
     const newErrors = {};
@@ -163,6 +189,8 @@ function App() {
     setForm(defaultForm);
     setErrors({});
     setSavedMessage(`${newGadget.gadgetName} was added to the inventory.`);
+    setCategoryFilter("All");
+    setSelectedGadgetId(newGadget.id);
     setPagination({
       pageIndex: 0,
       pageSize: 5,
@@ -178,6 +206,18 @@ function App() {
   const handleShowRegistry = () => {
     setSavedMessage("");
     setCurrentView("registry");
+  };
+
+  const handleCategoryFilterChange = (event) => {
+    setCategoryFilter(event.target.value);
+    setPagination({
+      pageIndex: 0,
+      pageSize: 5,
+    });
+  };
+
+  const handleSelectGadget = (gadget) => {
+    setSelectedGadgetId(gadget.id);
   };
 
   return (
@@ -320,7 +360,7 @@ function App() {
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Showing {table.getRowModel().rows.length} of{" "}
-                    {gadgets.length} saved gadgets
+                    {filteredGadgets.length} matching gadgets
                   </Typography>
                 </Stack>
 
@@ -329,73 +369,145 @@ function App() {
                 </Button>
               </Stack>
 
-              <TableContainer className="table-shell">
-                <Table>
-                  <TableHead>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                      <TableRow key={headerGroup.id}>
-                        {headerGroup.headers.map((header) => (
-                          <TableCell key={header.id}>
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                          </TableCell>
+              <FormControl className="filter-control">
+                <InputLabel id="filter-label">Category Filter</InputLabel>
+                <Select
+                  labelId="filter-label"
+                  label="Category Filter"
+                  value={categoryFilter}
+                  onChange={handleCategoryFilterChange}
+                >
+                  <MenuItem value="All">All Categories</MenuItem>
+                  <MenuItem value="Smartphone">Smartphone</MenuItem>
+                  <MenuItem value="Laptop">Laptop</MenuItem>
+                  <MenuItem value="Wearable">Wearable</MenuItem>
+                  <MenuItem value="Audio">Audio</MenuItem>
+                </Select>
+              </FormControl>
+
+              <Box className="registry-layout">
+                <Stack spacing={2}>
+                  <TableContainer className="table-shell">
+                    <Table>
+                      <TableHead>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                          <TableRow key={headerGroup.id}>
+                            {headerGroup.headers.map((header) => (
+                              <TableCell key={header.id}>
+                                {flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext(),
+                                )}
+                              </TableCell>
+                            ))}
+                          </TableRow>
                         ))}
-                      </TableRow>
-                    ))}
-                  </TableHead>
-                  <TableBody>
-                    {table.getRowModel().rows.length > 0 ? (
-                      table.getRowModel().rows.map((row) => (
-                        <TableRow key={row.original.id}>
-                          {row.getVisibleCells().map((cell) => (
-                            <TableCell key={cell.id}>
-                              {flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext(),
-                              )}
+                      </TableHead>
+                      <TableBody>
+                        {table.getRowModel().rows.length > 0 ? (
+                          table.getRowModel().rows.map((row) => (
+                            <TableRow
+                              className={
+                                selectedGadgetId === row.original.id
+                                  ? "selected-row"
+                                  : "clickable-row"
+                              }
+                              key={row.original.id}
+                              onClick={() => handleSelectGadget(row.original)}
+                            >
+                              {row.getVisibleCells().map((cell) => (
+                                <TableCell key={cell.id}>
+                                  {flexRender(
+                                    cell.column.columnDef.cell,
+                                    cell.getContext(),
+                                  )}
+                                </TableCell>
+                              ))}
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={columns.length} align="center">
+                              No gadgets match this category.
                             </TableCell>
-                          ))}
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={columns.length} align="center">
-                          No gadgets have been registered yet.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
 
-              <Stack
-                className="pagination-row"
-                direction={{ xs: "column", sm: "row" }}
-                spacing={2}
-              >
-                <Typography variant="body2" color="text.secondary">
-                  Page {pagination.pageIndex + 1} of {table.getPageCount() || 1}
-                </Typography>
+                  <Stack
+                    className="pagination-row"
+                    direction={{ xs: "column", sm: "row" }}
+                    spacing={2}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      Page {pagination.pageIndex + 1} of{" "}
+                      {table.getPageCount() || 1}
+                    </Typography>
 
-                <Stack direction="row" spacing={1}>
-                  <Button
-                    variant="outlined"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                  >
-                    Next
-                  </Button>
+                    <Stack direction="row" spacing={1}>
+                      <Button
+                        variant="outlined"
+                        onClick={() => table.previousPage()}
+                        disabled={!table.getCanPreviousPage()}
+                      >
+                        Previous
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        onClick={() => table.nextPage()}
+                        disabled={!table.getCanNextPage()}
+                      >
+                        Next
+                      </Button>
+                    </Stack>
+                  </Stack>
                 </Stack>
-              </Stack>
+
+                <Paper className="detail-card" elevation={0}>
+                  {activeGadget ? (
+                    <Stack spacing={2}>
+                      <Stack spacing={1}>
+                        <Typography variant="h6" component="h3">
+                          {activeGadget.gadgetName}
+                        </Typography>
+                        <Chip
+                          className="role-badge"
+                          label={activeGadget.role}
+                          size="small"
+                        />
+                      </Stack>
+
+                      <Box className="detail-list">
+                        <Typography>
+                          <span>Category:</span> {activeGadget.category}
+                        </Typography>
+                        <Typography>
+                          <span>Manufacturer:</span>{" "}
+                          {activeGadget.manufacturer}
+                        </Typography>
+                        <Typography>
+                          <span>Health Rating:</span>{" "}
+                          {activeGadget.healthRating}
+                        </Typography>
+                        <Typography>
+                          <span>Tech Brand:</span> {activeGadget.techBrand}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  ) : (
+                    <Stack spacing={1}>
+                      <Typography variant="h6" component="h3">
+                        Active Gadget
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Select a row to view full gadget details.
+                      </Typography>
+                    </Stack>
+                  )}
+                </Paper>
+              </Box>
             </Stack>
           </Paper>
         )}
