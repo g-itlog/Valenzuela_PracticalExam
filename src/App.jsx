@@ -272,13 +272,12 @@ function App() {
 
   return (
     <Box className="app">
-      <Box className="page">
+      <Box
+        className={currentView === "registry" ? "page registry-page" : "page"}
+      >
         <Stack className="page-header" spacing={1}>
           <Typography variant="h4" component="h1">
             Tech Gadget Inventory Hub
-          </Typography>
-          <Typography variant="body1">
-            Register Set C gadgets with complete inventory details.
           </Typography>
         </Stack>
 
@@ -444,7 +443,7 @@ function App() {
               <Box className="registry-layout">
                 <Stack spacing={2}>
                   <TableContainer className="table-shell">
-                    <Table size="small" sx={{ minWidth: 780 }}>
+                    <Table sx={{ minWidth: 940 }}>
                       <TableHead>
                         {table.getHeaderGroups().map((headerGroup) => (
                           <TableRow key={headerGroup.id}>
