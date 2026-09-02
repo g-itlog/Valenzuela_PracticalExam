@@ -275,15 +275,29 @@ function App() {
       <Box
         className={currentView === "registry" ? "page registry-page" : "page"}
       >
-        <Stack className="page-header" spacing={1}>
-          <Typography variant="h4" component="h1">
-            Tech Gadget Inventory Hub
+        <Stack className="page-header" spacing={1.25}>
+          <Typography className="page-title" variant="h4" component="h1">
+            <Box component="span" className="page-title-main">
+              Tech Gadget
+            </Box>{" "}
+            <Box component="span" className="page-title-accent">
+              Inventory Hub
+            </Box>
           </Typography>
+          <Box className="title-line" />
         </Stack>
 
         {currentView === "form" ? (
-          <Paper className="form-card" elevation={0}>
-            <Stack spacing={3} component="form" onSubmit={handleSubmit}>
+          <Paper
+            className="form-card"
+            elevation={0}
+            sx={{
+              borderRadius: "20px",
+              backgroundColor: "rgba(255, 255, 255, 0.94)",
+              boxShadow: "0 24px 54px rgba(10, 31, 68, 0.2)",
+            }}
+          >
+            <Stack spacing={0} component="form" onSubmit={handleSubmit}>
               <Stack
                 className="section-title-row"
                 direction={{ xs: "column", sm: "row" }}
@@ -299,110 +313,150 @@ function App() {
                 </Stack>
 
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   onClick={handleShowRegistry}
                   disabled={gadgets.length === 0}
                 >
-                  View Registry
+                  View registry
                 </Button>
               </Stack>
 
               {savedMessage && <Alert severity="success">{savedMessage}</Alert>}
 
-              <TextField
-                label="Gadget Name"
-                name="gadgetName"
-                value={form.gadgetName}
-                onChange={handleInputChange}
-                onBlur={handleInputBlur}
-                error={showFieldError("gadgetName")}
-                helperText={getHelperText("gadgetName")}
-                fullWidth
-              />
+              <Stack className="form-section" spacing={0}>
+                <Typography className="form-section-title">
+                  Gadget details
+                </Typography>
 
-              <FormControl fullWidth error={showFieldError("category")}>
-                <InputLabel id="category-label">Category</InputLabel>
-                <Select
-                  labelId="category-label"
-                  label="Category"
-                  name="category"
-                  value={form.category}
-                  onChange={handleInputChange}
-                  onBlur={handleInputBlur}
-                >
-                  <MenuItem value="Smartphone">Smartphone</MenuItem>
-                  <MenuItem value="Laptop">Laptop</MenuItem>
-                  <MenuItem value="Wearable">Wearable</MenuItem>
-                  <MenuItem value="Audio">Audio</MenuItem>
-                </Select>
-                <FormHelperText>{getHelperText("category")}</FormHelperText>
-              </FormControl>
-
-              <TextField
-                label="Manufacturer"
-                name="manufacturer"
-                value={form.manufacturer}
-                onChange={handleInputChange}
-                onBlur={handleInputBlur}
-                error={showFieldError("manufacturer")}
-                helperText={getHelperText("manufacturer")}
-                fullWidth
-              />
-
-              <TextField
-                label="Health Rating"
-                name="healthRating"
-                type="number"
-                value={form.healthRating}
-                onChange={handleInputChange}
-                onBlur={handleInputBlur}
-                error={showFieldError("healthRating")}
-                helperText={getHelperText("healthRating", "1 to 100")}
-                inputProps={{ min: 1, max: 100 }}
-                fullWidth
-              />
-
-              <TextField
-                label="Tech Brand Name"
-                name="techBrand"
-                value={form.techBrand}
-                onChange={handleInputChange}
-                onBlur={handleInputBlur}
-                error={showFieldError("techBrand")}
-                helperText={getHelperText("techBrand")}
-                fullWidth
-              />
-
-              <FormControl error={showFieldError("role")}>
-                <FormLabel>User Role</FormLabel>
-                <RadioGroup
-                  row
-                  name="role"
-                  value={form.role}
-                  onChange={handleInputChange}
-                  onBlur={handleInputBlur}
-                >
-                  <FormControlLabel
-                    value="Engineer"
-                    control={<Radio />}
-                    label="Engineer"
+                <Box className="form-grid">
+                  <TextField
+                    className="field-full"
+                    label="Gadget Name"
+                    name="gadgetName"
+                    value={form.gadgetName}
+                    onChange={handleInputChange}
+                    onBlur={handleInputBlur}
+                    error={showFieldError("gadgetName")}
+                    helperText={getHelperText("gadgetName")}
+                    fullWidth
                   />
-                  <FormControlLabel
-                    value="Tester"
-                    control={<Radio />}
-                    label="Tester"
-                  />
-                </RadioGroup>
-                <FormHelperText>{getHelperText("role")}</FormHelperText>
-              </FormControl>
 
-              <Button type="submit" variant="contained" size="large">
-                Save Gadget
-              </Button>
+                  <FormControl fullWidth error={showFieldError("category")}>
+                    <InputLabel id="category-label">Category</InputLabel>
+                    <Select
+                      labelId="category-label"
+                      label="Category"
+                      name="category"
+                      value={form.category}
+                      onChange={handleInputChange}
+                      onBlur={handleInputBlur}
+                    >
+                      <MenuItem value="Smartphone">Smartphone</MenuItem>
+                      <MenuItem value="Laptop">Laptop</MenuItem>
+                      <MenuItem value="Wearable">Wearable</MenuItem>
+                      <MenuItem value="Audio">Audio</MenuItem>
+                    </Select>
+                    <FormHelperText>{getHelperText("category")}</FormHelperText>
+                  </FormControl>
+
+                  <TextField
+                    label="Manufacturer"
+                    name="manufacturer"
+                    value={form.manufacturer}
+                    onChange={handleInputChange}
+                    onBlur={handleInputBlur}
+                    error={showFieldError("manufacturer")}
+                    helperText={getHelperText("manufacturer")}
+                    fullWidth
+                  />
+
+                  <TextField
+                    label="Health Rating"
+                    name="healthRating"
+                    type="number"
+                    value={form.healthRating}
+                    onChange={handleInputChange}
+                    onBlur={handleInputBlur}
+                    error={showFieldError("healthRating")}
+                    helperText={getHelperText("healthRating", "1 to 100")}
+                    slotProps={{
+                      htmlInput: { min: 1, max: 100 },
+                    }}
+                    fullWidth
+                  />
+                </Box>
+              </Stack>
+
+              <Box className="form-divider" />
+
+              <Stack className="form-section" spacing={0}>
+                <Typography className="form-section-title">
+                  Brand and role
+                </Typography>
+
+                <Box className="form-grid brand-grid">
+                  <TextField
+                    className="brand-field"
+                    label="Tech Brand Name"
+                    name="techBrand"
+                    value={form.techBrand}
+                    onChange={handleInputChange}
+                    onBlur={handleInputBlur}
+                    error={showFieldError("techBrand")}
+                    helperText={getHelperText("techBrand")}
+                    fullWidth
+                  />
+
+                  <FormControl
+                    className="role-control"
+                    error={showFieldError("role")}
+                  >
+                    <FormLabel>User Role</FormLabel>
+                    <RadioGroup
+                      className="role-group"
+                      row
+                      name="role"
+                      value={form.role}
+                      onChange={handleInputChange}
+                      onBlur={handleInputBlur}
+                    >
+                      <FormControlLabel
+                        className="role-option"
+                        value="Engineer"
+                        control={<Radio />}
+                        label="Engineer"
+                      />
+                      <FormControlLabel
+                        className="role-option"
+                        value="Tester"
+                        control={<Radio />}
+                        label="Tester"
+                      />
+                    </RadioGroup>
+                    <FormHelperText>{getHelperText("role")}</FormHelperText>
+                  </FormControl>
+                </Box>
+              </Stack>
+
+              <Box className="form-divider" />
+
+              <Box className="form-footer">
+                <Button type="submit" variant="contained" size="large">
+                  Save gadget
+                </Button>
+              </Box>
             </Stack>
           </Paper>
         ) : (
-          <Paper className="registry-card" elevation={0}>
+          <Paper
+            className="registry-card"
+            elevation={0}
+            sx={{
+              borderRadius: "20px",
+              backgroundColor: "rgba(255, 255, 255, 0.94)",
+              boxShadow: "0 24px 54px rgba(10, 31, 68, 0.2)",
+            }}
+          >
             <Stack spacing={3}>
               <Stack
                 className="section-title-row"
@@ -420,7 +474,7 @@ function App() {
                 </Stack>
 
                 <Button variant="contained" onClick={handleShowForm}>
-                  Add Another Gadget
+                  Add another gadget
                 </Button>
               </Stack>
 
@@ -520,7 +574,15 @@ function App() {
                   </Stack>
                 </Stack>
 
-                <Paper className="detail-card" elevation={0}>
+                <Paper
+                  className="detail-card"
+                  elevation={0}
+                  sx={{
+                    borderRadius: "16px",
+                    backgroundColor: "rgba(255, 255, 255, 0.94)",
+                    boxShadow: "0 20px 42px rgba(10, 31, 68, 0.16)",
+                  }}
+                >
                   {activeGadget ? (
                     <Stack spacing={2}>
                       <Stack spacing={1}>
