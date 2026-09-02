@@ -43,16 +43,44 @@ select {
   color: #5f6f89;
 }
 
-.form-card {
+.form-card,
+.registry-card {
   padding: 32px;
   border: 1px solid #dde5f2;
   border-radius: 8px;
   background: #ffffff;
 }
 
-.form-card h2 {
+.form-card h2,
+.registry-card h2 {
   color: #123c69;
   font-weight: 700;
+}
+
+.section-title-row {
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.table-shell {
+  border: 1px solid #dde5f2;
+  border-radius: 8px;
+}
+
+.table-shell th {
+  color: #123c69;
+  font-weight: 700;
+  background: #f8fafc;
+  white-space: nowrap;
+}
+
+.table-shell td {
+  color: #26364d;
+}
+
+.pagination-row {
+  align-items: center;
+  justify-content: space-between;
 }
 
 .MuiButton-contained {
@@ -72,5 +100,14 @@ select {
 
   .form-card {
     padding: 22px;
+  }
+
+  .registry-card {
+    padding: 22px;
+  }
+
+  .section-title-row,
+  .pagination-row {
+    align-items: stretch;
   }
 }
