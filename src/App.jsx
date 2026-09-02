@@ -176,7 +176,7 @@ function App() {
     }
 
     const newGadget = {
-      id: Date.now(),
+      id: `${Date.now()}-${gadgets.length + 1}`,
       gadgetName: form.gadgetName.trim(),
       category: form.category,
       manufacturer: form.manufacturer.trim(),
@@ -388,7 +388,7 @@ function App() {
               <Box className="registry-layout">
                 <Stack spacing={2}>
                   <TableContainer className="table-shell">
-                    <Table>
+                    <Table size="small" sx={{ minWidth: 780 }}>
                       <TableHead>
                         {table.getHeaderGroups().map((headerGroup) => (
                           <TableRow key={headerGroup.id}>

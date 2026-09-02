@@ -62,6 +62,17 @@ select {
   justify-content: space-between;
 }
 
+.filter-control {
+  width: min(280px, 100%);
+}
+
+.registry-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 20px;
+  align-items: flex-start;
+}
+
 .table-shell {
   border: 1px solid #dde5f2;
   border-radius: 8px;
@@ -78,9 +89,56 @@ select {
   color: #26364d;
 }
 
+.clickable-row,
+.selected-row {
+  cursor: pointer;
+}
+
+.clickable-row:hover {
+  background: #f8fafc;
+}
+
+.selected-row {
+  background: #edf5ff;
+}
+
+.selected-row td {
+  color: #123c69;
+  font-weight: 600;
+}
+
 .pagination-row {
   align-items: center;
   justify-content: space-between;
+}
+
+.detail-card {
+  padding: 22px;
+  border: 1px solid #dde5f2;
+  border-radius: 8px;
+  background: #fbfdff;
+}
+
+.detail-card h3 {
+  color: #123c69;
+  font-weight: 700;
+}
+
+.role-badge {
+  width: fit-content;
+  color: #123c69;
+  background: #dcecff;
+  font-weight: 700;
+}
+
+.detail-list {
+  display: grid;
+  gap: 10px;
+}
+
+.detail-list span {
+  color: #5f6f89;
+  font-weight: 700;
 }
 
 .MuiButton-contained {
@@ -109,5 +167,9 @@ select {
   .section-title-row,
   .pagination-row {
     align-items: stretch;
+  }
+
+  .registry-layout {
+    grid-template-columns: 1fr;
   }
 }
